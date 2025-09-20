@@ -1,0 +1,65 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Mountain Bikes CRUD API",
+    "version": "1.0.0",
+    "description": "Week 03 — CRUD only (no auth yet)"
+  },
+  "servers": [{ "url": "http://localhost:3000" }],
+  "paths": {
+    "/api/bikes": {
+      "get": {
+        "summary": "List bikes",
+        "tags": ["Bikes"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Bike" } }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new bike",
+        "tags": ["Bikes"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/Bike" } }
+          }
+        },
+        "responses": {
+          "201": { "description": "Created" },
+          "400": { "description": "Validation error" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Bike": {
+        "type": "object",
+        "required": [
+          "brand","model","year","frameSize","wheelSize",
+          "suspensionType","drivetrain","brakeType","weightKg","priceUSD"
+        ],
+        "properties": {
+          "brand":        { "type": "string", "example": "Trek" },
+          "model":        { "type": "string", "example": "Marlin 7" },
+          "year":         { "type": "integer", "example": 2024 },
+          "frameSize":    { "type": "string", "enum": ["XS","S","M","L","XL","XXL"], "example": "L" },
+          "wheelSize":    { "type": "number", "enum": [26,27.5,29], "example": 29 },
+          "suspensionType": { "type": "string", "enum": ["hardtail","full-suspension"], "example": "hardtail" },
+          "drivetrain":   { "type": "string", "example": "1x12 Shimano Deore" },
+          "brakeType":    { "type": "string", "enum": ["hydraulic-disc","mechanical-disc","rim"], "example": "hydraulic-disc" },
+          "weightKg":     { "type": "number", "example": 13.8 },
+          "priceUSD":     { "type": "number", "example": 1299.99 },
+          "inStock":      { "type": "boolean", "example": true }
+        }
+      }
+    }
+  }
+}
