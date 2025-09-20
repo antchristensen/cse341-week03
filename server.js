@@ -28,6 +28,7 @@ app.get('/', (_req, res) => {
 
 // Routes
 app.use('/api/bikes', require('./src/routes/bikes'));
+app.use('/api/brands', require('./src/routes/brands'));
 
 // 404
 app.use((req, res) => {

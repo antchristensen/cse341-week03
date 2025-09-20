@@ -1,13 +1,13 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "Mountain Bikes CRUD API",
+    "title": "Mountain Bikes & Brands CRUD API",
     "version": "1.0.0",
-    "description": "API for managing mountain bikes (Week 03 project). Supports CRUD operations with validation and error handling."
+    "description": "API for managing mountain bikes and brands (Week 03 project). Supports CRUD operations with validation and error handling."
   },
   "servers": [
-    { "url": "http://localhost:3000" },
-    { "url": "https://cse341-week03-il6o.onrender.com" }
+    { "url": "https://cse341-week03-il6o.onrender.com" },
+    { "url": "http://localhost:3000" }
   ],
   "paths": {
     "/api/bikes": {
@@ -97,6 +97,94 @@
           "404": { "description": "Bike not found" }
         }
       }
+    },
+    "/api/brands": {
+      "get": {
+        "summary": "List all brands",
+        "tags": ["Brands"],
+        "responses": {
+          "200": {
+            "description": "Array of brands",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Brand" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new brand",
+        "tags": ["Brands"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Brand" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Brand created" },
+          "400": { "description": "Validation error" }
+        }
+      }
+    },
+    "/api/brands/{id}": {
+      "get": {
+        "summary": "Get brand by ID",
+        "tags": ["Brands"],
+        "parameters": [
+          { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Brand found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Brand" }
+              }
+            }
+          },
+          "400": { "description": "Invalid ID format" },
+          "404": { "description": "Brand not found" }
+        }
+      },
+      "put": {
+        "summary": "Update a brand by ID",
+        "tags": ["Brands"],
+        "parameters": [
+          { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Brand" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Brand updated" },
+          "400": { "description": "Validation error or invalid ID" },
+          "404": { "description": "Brand not found" }
+        }
+      },
+      "delete": {
+        "summary": "Delete a brand by ID",
+        "tags": ["Brands"],
+        "parameters": [
+          { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "204": { "description": "Brand deleted successfully" },
+          "400": { "description": "Invalid ID format" },
+          "404": { "description": "Brand not found" }
+        }
+      }
     }
   },
   "components": {
@@ -140,6 +228,27 @@
           "brakeType",
           "weightKg",
           "priceUSD"
+        ]
+      },
+      "Brand": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string", "example": "64f1c6b67b5a3b5f2e8c7777" },
+          "name": { "type": "string", "example": "Specialized" },
+          "country": { "type": "string", "example": "USA" },
+          "foundedYear": { "type": "integer", "example": 1974 },
+          "website": { "type": "string", "example": "https://www.specialized.com" },
+          "headquarters": { "type": "string", "example": "Morgan Hill, California" },
+          "warrantyYears": { "type": "integer", "example": 2 },
+          "makesEbike": { "type": "boolean", "example": true }
+        },
+        "required": [
+          "name",
+          "country",
+          "foundedYear",
+          "website",
+          "headquarters",
+          "warrantyYears"
         ]
       }
     }

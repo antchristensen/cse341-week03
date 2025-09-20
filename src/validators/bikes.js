@@ -1,6 +1,6 @@
 const Joi = require('joi');
 
-// Mountain Bike schema — at least 7 fields
+// Mountain Bike schema
 const bikeSchema = Joi.object({
   brand: Joi.string().min(1).max(100).required(),
   model: Joi.string().min(1).max(120).required(),
@@ -19,7 +19,7 @@ function validateBody(schema) {
   return (req, _res, next) => {
     const { error, value } = schema.validate(req.body);
     if (error) return next(error);
-    req.validated = value; // sanitized inputs
+    req.validated = value; 
     next();
   };
 }
