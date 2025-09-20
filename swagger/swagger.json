@@ -7,7 +7,7 @@
   },
   "servers": [
     { "url": "http://localhost:3000" },
-    { "url": "https://cse341-week03-xxxx.onrender.com" }
+    { "url": "https://cse341-week03-il6o.onrender.com" }
   ],
   "paths": {
     "/api/bikes": {
