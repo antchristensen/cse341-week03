@@ -3,20 +3,26 @@
   "info": {
     "title": "Mountain Bikes CRUD API",
     "version": "1.0.0",
-    "description": "Week 03 — CRUD only (no auth yet)"
+    "description": "API for managing mountain bikes (Week 03 project). Supports CRUD operations with validation and error handling."
   },
-  "servers": [{ "url": "http://localhost:3000" }],
+  "servers": [
+    { "url": "http://localhost:3000" },
+    { "url": "https://cse341-week03-xxxx.onrender.com" }
+  ],
   "paths": {
     "/api/bikes": {
       "get": {
-        "summary": "List bikes",
+        "summary": "List all bikes",
         "tags": ["Bikes"],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Array of bikes",
             "content": {
               "application/json": {
-                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Bike" } }
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Bike" }
+                }
               }
             }
           }
@@ -28,12 +34,67 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/Bike" } }
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Bike" }
+            }
           }
         },
         "responses": {
-          "201": { "description": "Created" },
+          "201": { "description": "Bike created" },
           "400": { "description": "Validation error" }
+        }
+      }
+    },
+    "/api/bikes/{id}": {
+      "get": {
+        "summary": "Get a bike by ID",
+        "tags": ["Bikes"],
+        "parameters": [
+          { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bike found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Bike" }
+              }
+            }
+          },
+          "400": { "description": "Invalid ID format" },
+          "404": { "description": "Bike not found" }
+        }
+      },
+      "put": {
+        "summary": "Update a bike by ID",
+        "tags": ["Bikes"],
+        "parameters": [
+          { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Bike" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Bike updated" },
+          "400": { "description": "Validation error or invalid ID" },
+          "404": { "description": "Bike not found" }
+        }
+      },
+      "delete": {
+        "summary": "Delete a bike by ID",
+        "tags": ["Bikes"],
+        "parameters": [
+          { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "204": { "description": "Bike deleted successfully" },
+          "400": { "description": "Invalid ID format" },
+          "404": { "description": "Bike not found" }
         }
       }
     }
@@ -42,23 +103,44 @@
     "schemas": {
       "Bike": {
         "type": "object",
-        "required": [
-          "brand","model","year","frameSize","wheelSize",
-          "suspensionType","drivetrain","brakeType","weightKg","priceUSD"
-        ],
         "properties": {
-          "brand":        { "type": "string", "example": "Trek" },
-          "model":        { "type": "string", "example": "Marlin 7" },
-          "year":         { "type": "integer", "example": 2024 },
-          "frameSize":    { "type": "string", "enum": ["XS","S","M","L","XL","XXL"], "example": "L" },
-          "wheelSize":    { "type": "number", "enum": [26,27.5,29], "example": 29 },
-          "suspensionType": { "type": "string", "enum": ["hardtail","full-suspension"], "example": "hardtail" },
-          "drivetrain":   { "type": "string", "example": "1x12 Shimano Deore" },
-          "brakeType":    { "type": "string", "enum": ["hydraulic-disc","mechanical-disc","rim"], "example": "hydraulic-disc" },
-          "weightKg":     { "type": "number", "example": 13.8 },
-          "priceUSD":     { "type": "number", "example": 1299.99 },
-          "inStock":      { "type": "boolean", "example": true }
-        }
+          "_id": { "type": "string", "example": "64f1c6b67b5a3b5f2e8c1234" },
+          "brand": { "type": "string", "example": "Trek" },
+          "model": { "type": "string", "example": "Marlin 7" },
+          "year": { "type": "integer", "example": 2024 },
+          "frameSize": {
+            "type": "string",
+            "enum": ["XS", "S", "M", "L", "XL", "XXL"],
+            "example": "L"
+          },
+          "wheelSize": { "type": "number", "enum": [26, 27.5, 29], "example": 29 },
+          "suspensionType": {
+            "type": "string",
+            "enum": ["hardtail", "full-suspension"],
+            "example": "hardtail"
+          },
+          "drivetrain": { "type": "string", "example": "1x12 Shimano Deore" },
+          "brakeType": {
+            "type": "string",
+            "enum": ["hydraulic-disc", "mechanical-disc", "rim"],
+            "example": "hydraulic-disc"
+          },
+          "weightKg": { "type": "number", "example": 13.8 },
+          "priceUSD": { "type": "number", "example": 1299.99 },
+          "inStock": { "type": "boolean", "example": true }
+        },
+        "required": [
+          "brand",
+          "model",
+          "year",
+          "frameSize",
+          "wheelSize",
+          "suspensionType",
+          "drivetrain",
+          "brakeType",
+          "weightKg",
+          "priceUSD"
+        ]
       }
     }
   }

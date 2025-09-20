@@ -5,7 +5,8 @@ const morgan = require('morgan');
 const cors = require('cors');
 const { connectToDb } = require('./src/db/connection');
 const errorHandler = require('./src/middleware/errorHandler');
-
+const swaggerUi = require('swagger-ui-express');
+const swaggerDoc = require('./swagger/swagger.json');
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -15,6 +16,10 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
+
+
+// Swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc, { explorer: true }));
 
 // Health route
 app.get('/', (_req, res) => {
