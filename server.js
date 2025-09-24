@@ -1,44 +1,100 @@
+// server.js
 require('dotenv').config();
+
 const express = require('express');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const cors = require('cors');
+const session = require('express-session');
+
 const { connectToDb } = require('./src/db/connection');
 const errorHandler = require('./src/middleware/errorHandler');
+
+//  OAuth 
+const { passport, configurePassport } = require('./src/auth/passport');
+
 const swaggerUi = require('swagger-ui-express');
 const swaggerDoc = require('./swagger/swagger.json');
+
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Middleware
-app.use(helmet());
-app.use(cors());
+/* ---------- Core app & security ---------- */
+
+// Needed on Render so secure cookies work behind proxy
+app.set('trust proxy', 1);
+
+// Helmet (relax CSP for Swagger UI assets)
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: false
+  })
+);
+
+// CORS: allow same-origin Swagger UI & cookies
+app.use(
+  cors({
+    origin: true,          // reflect request origin
+    credentials: true      // allow cookies
+  })
+);
+
+// Body parsers & logging
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
+/* ---------- Sessions & Passport ---------- */
 
-// Swagger
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET, // set in .env / Render Env
+    resave: false,
+    saveUninitialized: false,
+    proxy: true,
+    cookie: {
+      httpOnly: true,
+      secure: process.env.BASE_URL?.startsWith('https://') ? true : false, // https in production
+      sameSite: 'lax',
+      maxAge: 1000 * 60 * 60 * 8 // 8 hours
+    }
+  })
+);
+
+configurePassport();
+app.use(passport.initialize());
+app.use(passport.session());
+
+/* ---------- Swagger Docs ---------- */
+
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc, { explorer: true }));
 
-// Health route
+/* ---------- Health ---------- */
+
 app.get('/', (_req, res) => {
-  res.json({ status: 'OK', message: 'Week 03 Mountain Bikes CRUD API is running' });
+  res.json({ status: 'OK', message: 'Week 03/04 MTB API is running' });
 });
 
-// Routes
+/* ---------- Routes ---------- */
+
+// Auth (Google OAuth, session info, logout)
+app.use('/auth', require('./src/routes/auth'));
+
+// Collections
 app.use('/api/bikes', require('./src/routes/bikes'));
 app.use('/api/brands', require('./src/routes/brands'));
 
-// 404
+/* ---------- 404 & Error Handler ---------- */
+
 app.use((req, res) => {
   res.status(404).json({ error: 'Not found' });
 });
 
-// Global error handler
 app.use(errorHandler);
 
-// Start server after DB connects
+/* ---------- Start after DB connects ---------- */
+
 connectToDb()
   .then(() => {
     app.listen(port, () => console.log(`Server listening on port http://localhost:${port}`));

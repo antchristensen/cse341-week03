@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "Mountain Bikes & Brands CRUD API",
+    "title": "Mountain Bikes & Brands CRUD API with OAuth",
     "version": "1.0.0",
-    "description": "API for managing mountain bikes and brands (Week 03 project). Supports CRUD operations with validation and error handling."
+    "description": "API for managing mountain bikes and brands (Weeks 03–04 project). Supports CRUD operations with validation, error handling, and OAuth authentication."
   },
   "servers": [
     { "url": "https://cse341-week03-il6o.onrender.com" },
@@ -19,10 +19,7 @@
             "description": "Array of bikes",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": { "$ref": "#/components/schemas/Bike" }
-                }
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Bike" } }
               }
             }
           }
@@ -31,17 +28,15 @@
       "post": {
         "summary": "Create a new bike",
         "tags": ["Bikes"],
+        "security": [{ "cookieAuth": [] }],
         "requestBody": {
           "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/Bike" }
-            }
-          }
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Bike" } } }
         },
         "responses": {
           "201": { "description": "Bike created" },
-          "400": { "description": "Validation error" }
+          "400": { "description": "Validation error" },
+          "401": { "description": "Unauthorized" }
         }
       }
     },
@@ -55,46 +50,42 @@
         "responses": {
           "200": {
             "description": "Bike found",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/Bike" }
-              }
-            }
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Bike" } } }
           },
-          "400": { "description": "Invalid ID format" },
-          "404": { "description": "Bike not found" }
+          "400": { "description": "Invalid ID" },
+          "404": { "description": "Not found" }
         }
       },
       "put": {
         "summary": "Update a bike by ID",
         "tags": ["Bikes"],
+        "security": [{ "cookieAuth": [] }],
         "parameters": [
           { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } }
         ],
         "requestBody": {
           "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/Bike" }
-            }
-          }
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Bike" } } }
         },
         "responses": {
           "200": { "description": "Bike updated" },
-          "400": { "description": "Validation error or invalid ID" },
-          "404": { "description": "Bike not found" }
+          "400": { "description": "Validation error" },
+          "401": { "description": "Unauthorized" },
+          "404": { "description": "Not found" }
         }
       },
       "delete": {
         "summary": "Delete a bike by ID",
         "tags": ["Bikes"],
+        "security": [{ "cookieAuth": [] }],
         "parameters": [
           { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } }
         ],
         "responses": {
-          "204": { "description": "Bike deleted successfully" },
-          "400": { "description": "Invalid ID format" },
-          "404": { "description": "Bike not found" }
+          "204": { "description": "Deleted" },
+          "400": { "description": "Invalid ID" },
+          "401": { "description": "Unauthorized" },
+          "404": { "description": "Not found" }
         }
       }
     },
@@ -107,10 +98,7 @@
             "description": "Array of brands",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": { "$ref": "#/components/schemas/Brand" }
-                }
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Brand" } }
               }
             }
           }
@@ -119,17 +107,15 @@
       "post": {
         "summary": "Create a new brand",
         "tags": ["Brands"],
+        "security": [{ "cookieAuth": [] }],
         "requestBody": {
           "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/Brand" }
-            }
-          }
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Brand" } } }
         },
         "responses": {
           "201": { "description": "Brand created" },
-          "400": { "description": "Validation error" }
+          "400": { "description": "Validation error" },
+          "401": { "description": "Unauthorized" }
         }
       }
     },
@@ -143,51 +129,104 @@
         "responses": {
           "200": {
             "description": "Brand found",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/Brand" }
-              }
-            }
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Brand" } } }
           },
-          "400": { "description": "Invalid ID format" },
-          "404": { "description": "Brand not found" }
+          "400": { "description": "Invalid ID" },
+          "404": { "description": "Not found" }
         }
       },
       "put": {
         "summary": "Update a brand by ID",
         "tags": ["Brands"],
+        "security": [{ "cookieAuth": [] }],
         "parameters": [
           { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } }
         ],
         "requestBody": {
           "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/Brand" }
-            }
-          }
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Brand" } } }
         },
         "responses": {
           "200": { "description": "Brand updated" },
-          "400": { "description": "Validation error or invalid ID" },
-          "404": { "description": "Brand not found" }
+          "400": { "description": "Validation error" },
+          "401": { "description": "Unauthorized" },
+          "404": { "description": "Not found" }
         }
       },
       "delete": {
         "summary": "Delete a brand by ID",
         "tags": ["Brands"],
+        "security": [{ "cookieAuth": [] }],
         "parameters": [
           { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } }
         ],
         "responses": {
-          "204": { "description": "Brand deleted successfully" },
-          "400": { "description": "Invalid ID format" },
-          "404": { "description": "Brand not found" }
+          "204": { "description": "Deleted" },
+          "400": { "description": "Invalid ID" },
+          "401": { "description": "Unauthorized" },
+          "404": { "description": "Not found" }
+        }
+      }
+    },
+    "/auth/google": {
+      "get": {
+        "summary": "Start Google OAuth login",
+        "tags": ["Auth"],
+        "responses": {
+          "302": { "description": "Redirect to Google login" }
+        }
+      }
+    },
+    "/auth/google/callback": {
+      "get": {
+        "summary": "Google OAuth callback",
+        "tags": ["Auth"],
+        "responses": {
+          "302": { "description": "Redirect after login" }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "summary": "Get current session user",
+        "tags": ["Auth"],
+        "responses": {
+          "200": {
+            "description": "Auth status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "authenticated": { "type": "boolean" },
+                    "user": { "type": "object" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "summary": "Logout and clear session",
+        "tags": ["Auth"],
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "204": { "description": "Logged out" }
         }
       }
     }
   },
   "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "connect.sid"
+      }
+    },
     "schemas": {
       "Bike": {
         "type": "object",
@@ -218,16 +257,8 @@
           "inStock": { "type": "boolean", "example": true }
         },
         "required": [
-          "brand",
-          "model",
-          "year",
-          "frameSize",
-          "wheelSize",
-          "suspensionType",
-          "drivetrain",
-          "brakeType",
-          "weightKg",
-          "priceUSD"
+          "brand", "model", "year", "frameSize", "wheelSize",
+          "suspensionType", "drivetrain", "brakeType", "weightKg", "priceUSD"
         ]
       },
       "Brand": {
@@ -239,16 +270,11 @@
           "foundedYear": { "type": "integer", "example": 1974 },
           "website": { "type": "string", "example": "https://www.specialized.com" },
           "headquarters": { "type": "string", "example": "Morgan Hill, California" },
-          "warrantyYears": { "type": "integer", "example": 2 },
+          "warrantyYears": { "type": "integer", "example": 3 },
           "makesEbike": { "type": "boolean", "example": true }
         },
         "required": [
-          "name",
-          "country",
-          "foundedYear",
-          "website",
-          "headquarters",
-          "warrantyYears"
+          "name", "country", "foundedYear", "website", "headquarters", "warrantyYears"
         ]
       }
     }
