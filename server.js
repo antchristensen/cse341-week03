@@ -12,6 +12,7 @@ const errorHandler = require('./src/middleware/errorHandler');
 
 //  OAuth 
 const { passport, configurePassport } = require('./src/auth/passport');
+const requireAuth = require('./src/middleware/requireAuth');
 
 const swaggerUi = require('swagger-ui-express');
 const swaggerDoc = require('./swagger/swagger.json');
@@ -81,9 +82,17 @@ app.get('/', (_req, res) => {
 // Auth (Google OAuth, session info, logout)
 app.use('/auth', require('./src/routes/auth'));
 
+// Protect only write methods for API collections
+const protectWrites = (req, res, next) => {
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+    return requireAuth(req, res, next);
+  }
+  return next();
+};
+
 // Collections
-app.use('/api/bikes', require('./src/routes/bikes'));
-app.use('/api/brands', require('./src/routes/brands'));
+app.use('/api/bikes', protectWrites, require('./src/routes/bikes'));
+app.use('/api/brands', protectWrites, require('./src/routes/brands'));
 
 /* ---------- 404 & Error Handler ---------- */
 
@@ -97,7 +106,7 @@ app.use(errorHandler);
 
 connectToDb()
   .then(() => {
-    app.listen(port, () => console.log(`Server listening on port http://localhost:${port}`));
+    app.listen(port, () => console.log(`Server listening on http://localhost:${port}`));
   })
   .catch((err) => {
     console.error('Failed to connect to DB:', err);

@@ -1,19 +1,103 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "Mountain Bikes & Brands CRUD API with OAuth",
+    "title": "MTB API (Week 04)",
     "version": "1.0.0",
-    "description": "API for managing mountain bikes and brands (Weeks 03–04 project). Supports CRUD operations with validation, error handling, and OAuth authentication."
+    "description": "Mountain Bikes API with Google OAuth login. Public GETs; write operations require login."
   },
   "servers": [
-    { "url": "https://cse341-week03-il6o.onrender.com" },
     { "url": "http://localhost:3000" }
   ],
+  "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "connect.sid",
+        "description": "Session cookie set after Google OAuth. Start at /auth/google to obtain it."
+      }
+    },
+    "schemas": {
+      "Bike": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "brandId": { "type": "string" },
+          "name": { "type": "string" },
+          "price": { "type": "number" }
+        }
+      },
+      "Brand": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "name": { "type": "string" }
+        }
+      }
+    }
+  },
   "paths": {
+    "/auth/google": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Start Google OAuth login",
+        "responses": {
+          "302": { "description": "Redirects to Google for login/consent" }
+        }
+      }
+    },
+    "/auth/google/callback": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Google OAuth callback",
+        "responses": {
+          "302": { "description": "Redirects to /auth/success on success, /auth/failure on error" }
+        }
+      }
+    },
+    "/auth/success": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Login success",
+        "responses": {
+          "200": { "description": "Returns a success message and user info" }
+        }
+      }
+    },
+    "/auth/failure": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Login failed",
+        "responses": {
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Get current authenticated user",
+        "responses": {
+          "200": {
+            "description": "Returns { authenticated: boolean, user?: {...} }"
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Logout current user",
+        "responses": {
+          "204": { "description": "Logged out, session cleared" }
+        }
+      }
+    },
+
     "/api/bikes": {
       "get": {
-        "summary": "List all bikes",
         "tags": ["Bikes"],
+        "summary": "List bikes (public)",
         "responses": {
           "200": {
             "description": "Array of bikes",
@@ -26,73 +110,56 @@
         }
       },
       "post": {
-        "summary": "Create a new bike",
         "tags": ["Bikes"],
-        "security": [{ "cookieAuth": [] }],
-        "requestBody": {
-          "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Bike" } } }
-        },
+        "summary": "Create a new bike (requires login)",
+        "security": [ { "cookieAuth": [] } ],
         "responses": {
-          "201": { "description": "Bike created" },
-          "400": { "description": "Validation error" },
+          "201": { "description": "Created" },
           "401": { "description": "Unauthorized" }
         }
       }
     },
     "/api/bikes/{id}": {
       "get": {
-        "summary": "Get a bike by ID",
         "tags": ["Bikes"],
+        "summary": "Get a bike by id (public)",
         "parameters": [
-          { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } }
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
-        "responses": {
-          "200": {
-            "description": "Bike found",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Bike" } } }
-          },
-          "400": { "description": "Invalid ID" },
-          "404": { "description": "Not found" }
-        }
+        "responses": { "200": { "description": "OK" }, "404": { "description": "Not found" } }
       },
       "put": {
-        "summary": "Update a bike by ID",
         "tags": ["Bikes"],
-        "security": [{ "cookieAuth": [] }],
+        "summary": "Update a bike (requires login)",
+        "security": [ { "cookieAuth": [] } ],
         "parameters": [
-          { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } }
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
-        "requestBody": {
-          "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Bike" } } }
-        },
         "responses": {
-          "200": { "description": "Bike updated" },
-          "400": { "description": "Validation error" },
+          "200": { "description": "Updated" },
           "401": { "description": "Unauthorized" },
           "404": { "description": "Not found" }
         }
       },
       "delete": {
-        "summary": "Delete a bike by ID",
         "tags": ["Bikes"],
-        "security": [{ "cookieAuth": [] }],
+        "summary": "Delete a bike (requires login)",
+        "security": [ { "cookieAuth": [] } ],
         "parameters": [
-          { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } }
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
         "responses": {
           "204": { "description": "Deleted" },
-          "400": { "description": "Invalid ID" },
           "401": { "description": "Unauthorized" },
           "404": { "description": "Not found" }
         }
       }
     },
+
     "/api/brands": {
       "get": {
-        "summary": "List all brands",
         "tags": ["Brands"],
+        "summary": "List brands (public)",
         "responses": {
           "200": {
             "description": "Array of brands",
@@ -105,178 +172,52 @@
         }
       },
       "post": {
-        "summary": "Create a new brand",
         "tags": ["Brands"],
-        "security": [{ "cookieAuth": [] }],
-        "requestBody": {
-          "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Brand" } } }
-        },
-        "responses": {
-          "201": { "description": "Brand created" },
-          "400": { "description": "Validation error" },
-          "401": { "description": "Unauthorized" }
-        }
+        "summary": "Create a new brand (requires login)",
+        "security": [ { "cookieAuth": [] } ],
+        "responses": { "201": { "description": "Created" }, "401": { "description": "Unauthorized" } }
       }
     },
     "/api/brands/{id}": {
       "get": {
-        "summary": "Get brand by ID",
         "tags": ["Brands"],
+        "summary": "Get a brand by id (public)",
         "parameters": [
-          { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } }
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
-        "responses": {
-          "200": {
-            "description": "Brand found",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Brand" } } }
-          },
-          "400": { "description": "Invalid ID" },
-          "404": { "description": "Not found" }
-        }
+        "responses": { "200": { "description": "OK" }, "404": { "description": "Not found" } }
       },
       "put": {
-        "summary": "Update a brand by ID",
         "tags": ["Brands"],
-        "security": [{ "cookieAuth": [] }],
+        "summary": "Update a brand (requires login)",
+        "security": [ { "cookieAuth": [] } ],
         "parameters": [
-          { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } }
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
-        "requestBody": {
-          "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Brand" } } }
-        },
         "responses": {
-          "200": { "description": "Brand updated" },
-          "400": { "description": "Validation error" },
+          "200": { "description": "Updated" },
           "401": { "description": "Unauthorized" },
           "404": { "description": "Not found" }
         }
       },
       "delete": {
-        "summary": "Delete a brand by ID",
         "tags": ["Brands"],
-        "security": [{ "cookieAuth": [] }],
+        "summary": "Delete a brand (requires login)",
+        "security": [ { "cookieAuth": [] } ],
         "parameters": [
-          { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } }
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
         "responses": {
           "204": { "description": "Deleted" },
-          "400": { "description": "Invalid ID" },
           "401": { "description": "Unauthorized" },
           "404": { "description": "Not found" }
         }
       }
-    },
-    "/auth/google": {
-      "get": {
-        "summary": "Start Google OAuth login",
-        "tags": ["Auth"],
-        "responses": {
-          "302": { "description": "Redirect to Google login" }
-        }
-      }
-    },
-    "/auth/google/callback": {
-      "get": {
-        "summary": "Google OAuth callback",
-        "tags": ["Auth"],
-        "responses": {
-          "302": { "description": "Redirect after login" }
-        }
-      }
-    },
-    "/auth/me": {
-      "get": {
-        "summary": "Get current session user",
-        "tags": ["Auth"],
-        "responses": {
-          "200": {
-            "description": "Auth status",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "authenticated": { "type": "boolean" },
-                    "user": { "type": "object" }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/auth/logout": {
-      "post": {
-        "summary": "Logout and clear session",
-        "tags": ["Auth"],
-        "security": [{ "cookieAuth": [] }],
-        "responses": {
-          "204": { "description": "Logged out" }
-        }
-      }
     }
   },
-  "components": {
-    "securitySchemes": {
-      "cookieAuth": {
-        "type": "apiKey",
-        "in": "cookie",
-        "name": "connect.sid"
-      }
-    },
-    "schemas": {
-      "Bike": {
-        "type": "object",
-        "properties": {
-          "_id": { "type": "string", "example": "64f1c6b67b5a3b5f2e8c1234" },
-          "brand": { "type": "string", "example": "Trek" },
-          "model": { "type": "string", "example": "Marlin 7" },
-          "year": { "type": "integer", "example": 2024 },
-          "frameSize": {
-            "type": "string",
-            "enum": ["XS", "S", "M", "L", "XL", "XXL"],
-            "example": "L"
-          },
-          "wheelSize": { "type": "number", "enum": [26, 27.5, 29], "example": 29 },
-          "suspensionType": {
-            "type": "string",
-            "enum": ["hardtail", "full-suspension"],
-            "example": "hardtail"
-          },
-          "drivetrain": { "type": "string", "example": "1x12 Shimano Deore" },
-          "brakeType": {
-            "type": "string",
-            "enum": ["hydraulic-disc", "mechanical-disc", "rim"],
-            "example": "hydraulic-disc"
-          },
-          "weightKg": { "type": "number", "example": 13.8 },
-          "priceUSD": { "type": "number", "example": 1299.99 },
-          "inStock": { "type": "boolean", "example": true }
-        },
-        "required": [
-          "brand", "model", "year", "frameSize", "wheelSize",
-          "suspensionType", "drivetrain", "brakeType", "weightKg", "priceUSD"
-        ]
-      },
-      "Brand": {
-        "type": "object",
-        "properties": {
-          "_id": { "type": "string", "example": "64f1c6b67b5a3b5f2e8c7777" },
-          "name": { "type": "string", "example": "Specialized" },
-          "country": { "type": "string", "example": "USA" },
-          "foundedYear": { "type": "integer", "example": 1974 },
-          "website": { "type": "string", "example": "https://www.specialized.com" },
-          "headquarters": { "type": "string", "example": "Morgan Hill, California" },
-          "warrantyYears": { "type": "integer", "example": 3 },
-          "makesEbike": { "type": "boolean", "example": true }
-        },
-        "required": [
-          "name", "country", "foundedYear", "website", "headquarters", "warrantyYears"
-        ]
-      }
-    }
-  }
+  "tags": [
+    { "name": "Auth" },
+    { "name": "Bikes" },
+    { "name": "Brands" }
+  ]
 }
