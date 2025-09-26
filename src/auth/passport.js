@@ -17,7 +17,7 @@ passport.deserializeUser(async (id, done) => {
 function configurePassport() {
   const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } = process.env;
 
-  // Prefer explicit GOOGLE_CALLBACK_URL; else build from BASE_URL; else localhost.
+  
   const callbackURL =
     process.env.GOOGLE_CALLBACK_URL ||
     `${(process.env.BASE_URL || 'http://localhost:3000').replace(/\/$/, '')}/auth/google/callback`;
@@ -39,16 +39,16 @@ function configurePassport() {
             $setOnInsert: { createdAt: new Date(), role: 'user' }
           };
 
-          // Options compatible with MongoDB driver v3 and v4+:
+          
           const options = {
             upsert: true,
-            returnDocument: 'after', // v4/v5
-            returnOriginal: false    // v3
+            returnDocument: 'after', 
+            returnOriginal: false    
           };
 
           const result = await users.findOneAndUpdate(filter, update, options);
 
-          // Safe follow-up fetch in case .value is null
+          
           let user = result?.value;
           if (!user) user = await users.findOne(filter);
           if (!user) return done(new Error('Upsert appeared to succeed but no user found'));

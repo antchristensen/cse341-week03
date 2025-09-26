@@ -7,7 +7,7 @@ router.get('/google',
   passport.authenticate('google', { scope: ['profile', 'email'] })
 );
 
-// Callback with inline handler so real errors show up
+
 router.get('/google/callback', (req, res, next) => {
   passport.authenticate('google', { session: true }, (err, user, info) => {
     if (err) {
