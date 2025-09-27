@@ -6,8 +6,8 @@
     "description": "Mountain Bikes API with Google OAuth login. Public GETs; write operations require login."
   },
   "servers": [
-    { "url": "http://localhost:3000" },
-    { "url": "https://cse341-week03-il6o.onrender.com" }
+    { "url": "https://cse341-week03-il6o.onrender.com/" },
+    { "url": "http://localhost:3000" }
   ],
   "components": {
     "securitySchemes": {
@@ -22,18 +22,20 @@
       "Bike": {
         "type": "object",
         "properties": {
-          "_id": { "type": "string" },
-          "brandId": { "type": "string" },
+          "_id": { "type": "string", "readOnly": true },
+          "brandId": { "type": "string", "description": "Mongo ObjectId string of a Brand" },
           "name": { "type": "string" },
           "price": { "type": "number" }
-        }
+        },
+        "required": ["brandId", "name", "price"]
       },
       "Brand": {
         "type": "object",
         "properties": {
-          "_id": { "type": "string" },
+          "_id": { "type": "string", "readOnly": true },
           "name": { "type": "string" }
-        }
+        },
+        "required": ["name"]
       }
     }
   },
@@ -114,6 +116,19 @@
         "tags": ["Bikes"],
         "summary": "Create a new bike (requires login)",
         "security": [ { "cookieAuth": [] } ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Bike" },
+              "example": {
+                "brandId": "60af8846e13f1c39b0dfb123",
+                "name": "Demo Bike",
+                "price": 999
+              }
+            }
+          }
+        },
         "responses": {
           "201": { "description": "Created" },
           "401": { "description": "Unauthorized" }
@@ -136,6 +151,19 @@
         "parameters": [
           { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Bike" },
+              "example": {
+                "brandId": "60af8846e13f1c39b0dfb123",
+                "name": "Updated Bike",
+                "price": 1200
+              }
+            }
+          }
+        },
         "responses": {
           "200": { "description": "Updated" },
           "401": { "description": "Unauthorized" },
@@ -176,6 +204,17 @@
         "tags": ["Brands"],
         "summary": "Create a new brand (requires login)",
         "security": [ { "cookieAuth": [] } ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Brand" },
+              "example": {
+                "name": "Specialized"
+              }
+            }
+          }
+        },
         "responses": { "201": { "description": "Created" }, "401": { "description": "Unauthorized" } }
       }
     },
@@ -195,6 +234,17 @@
         "parameters": [
           { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Brand" },
+              "example": {
+                "name": "Updated Brand Name"
+              }
+            }
+          }
+        },
         "responses": {
           "200": { "description": "Updated" },
           "401": { "description": "Unauthorized" },
