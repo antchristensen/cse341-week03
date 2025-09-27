@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "MTB API (Week 04)",
-    "version": "1.0.0",
+    "version": "1.0.3",
     "description": "Mountain Bikes API with Google OAuth login. Public GETs; write operations require login."
   },
   "servers": [
@@ -22,18 +22,32 @@
       "Bike": {
         "type": "object",
         "properties": {
-          "_id": { "type": "string", "readOnly": true },
-          "brandId": { "type": "string", "description": "Mongo ObjectId string of a Brand" },
-          "name": { "type": "string" },
-          "price": { "type": "number" }
+          "_id": { "type": "string", "readOnly": true, "example": "68ce0eb10534578934c18b96" },
+          "brand": { "type": "string", "example": "Specialized", "description": "Brand name or ID, depending on your API" },
+          "model": { "type": "string", "example": "Rockhopper Sport" },
+          "year": { "type": "integer", "example": 2023 },
+          "frameSize": { "type": "string", "example": "M" },
+          "wheelSize": { "type": "integer", "example": 29 },
+          "suspensionType": { "type": "string", "example": "hardtail" },
+          "drivetrain": { "type": "string", "example": "2x9 Shimano Altus" },
+          "brakeType": { "type": "string", "example": "hydraulic-disc" },
+          "weightKg": { "type": "number", "example": 14.5 },
+          "priceUSD": { "type": "number", "example": 750 },
+          "inStock": { "type": "boolean", "example": true }
         },
-        "required": ["brandId", "name", "price"]
+        "required": ["brand", "model", "year", "frameSize", "wheelSize", "priceUSD", "inStock"]
       },
       "Brand": {
         "type": "object",
         "properties": {
-          "_id": { "type": "string", "readOnly": true },
-          "name": { "type": "string" }
+          "_id": { "type": "string", "readOnly": true, "example": "68ce1506992eb5dd4db50f36" },
+          "name": { "type": "string", "example": "Trek" },
+          "country": { "type": "string", "example": "USA" },
+          "foundedYear": { "type": "integer", "example": 1976 },
+          "website": { "type": "string", "format": "uri", "example": "https://www.trekbikes.com" },
+          "headquarters": { "type": "string", "example": "Waterloo, Wisconsin" },
+          "warrantyYears": { "type": "integer", "example": 2 },
+          "makesEbike": { "type": "boolean", "example": true }
         },
         "required": ["name"]
       }
@@ -81,9 +95,7 @@
         "tags": ["Auth"],
         "summary": "Get current authenticated user",
         "responses": {
-          "200": {
-            "description": "Returns { authenticated: boolean, user?: {...} }"
-          }
+          "200": { "description": "Returns { authenticated: boolean, user?: {...} }" }
         }
       }
     },
@@ -122,9 +134,17 @@
             "application/json": {
               "schema": { "$ref": "#/components/schemas/Bike" },
               "example": {
-                "brandId": "60af8846e13f1c39b0dfb123",
-                "name": "Demo Bike",
-                "price": 999
+                "brand": "Specialized",
+                "model": "Rockhopper Sport",
+                "year": 2023,
+                "frameSize": "M",
+                "wheelSize": 29,
+                "suspensionType": "hardtail",
+                "drivetrain": "2x9 Shimano Altus",
+                "brakeType": "hydraulic-disc",
+                "weightKg": 14.5,
+                "priceUSD": 750,
+                "inStock": true
               }
             }
           }
@@ -157,9 +177,17 @@
             "application/json": {
               "schema": { "$ref": "#/components/schemas/Bike" },
               "example": {
-                "brandId": "60af8846e13f1c39b0dfb123",
-                "name": "Updated Bike",
-                "price": 1200
+                "brand": "Specialized",
+                "model": "Rockhopper Sport",
+                "year": 2023,
+                "frameSize": "M",
+                "wheelSize": 29,
+                "suspensionType": "hardtail",
+                "drivetrain": "2x9 Shimano Altus",
+                "brakeType": "hydraulic-disc",
+                "weightKg": 14.5,
+                "priceUSD": 800,
+                "inStock": false
               }
             }
           }
@@ -210,7 +238,13 @@
             "application/json": {
               "schema": { "$ref": "#/components/schemas/Brand" },
               "example": {
-                "name": "Specialized"
+                "name": "Trek",
+                "country": "USA",
+                "foundedYear": 1976,
+                "website": "https://www.trekbikes.com",
+                "headquarters": "Waterloo, Wisconsin",
+                "warrantyYears": 2,
+                "makesEbike": true
               }
             }
           }
@@ -240,7 +274,13 @@
             "application/json": {
               "schema": { "$ref": "#/components/schemas/Brand" },
               "example": {
-                "name": "Updated Brand Name"
+                "name": "Trek",
+                "country": "USA",
+                "foundedYear": 1976,
+                "website": "https://www.trekbikes.com",
+                "headquarters": "Waterloo, Wisconsin",
+                "warrantyYears": 3,
+                "makesEbike": true
               }
             }
           }
