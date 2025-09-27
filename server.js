@@ -22,10 +22,10 @@ const port = process.env.PORT || 3000;
 
 /* ---------- Core app & security ---------- */
 
-// Needed on Render so secure cookies work behind proxy
+
 app.set('trust proxy', 1);
 
-// Helmet (relax CSP for Swagger UI assets)
+// Helmet
 app.use(
   helmet({
     contentSecurityPolicy: false,
@@ -36,11 +36,11 @@ app.use(
 // CORS: allow same-origin Swagger UI & cookies
 app.use(
   cors({
-    origin: true,          // reflect request origin
-    credentials: true      // allow cookies
+    origin: true,          
+    credentials: true      
   })
 );
-// **NEW** – handle CORS preflight so Swagger POST/PUT/DELETE don’t show “Failed to fetch”
+
 app.options('*', cors());
 
 // Body parsers & logging
@@ -52,15 +52,15 @@ app.use(morgan('dev'));
 
 app.use(
   session({
-    secret: process.env.SESSION_SECRET, // set in .env / Render Env
+    secret: process.env.SESSION_SECRET, 
     resave: false,
     saveUninitialized: false,
     proxy: true,
     cookie: {
       httpOnly: true,
-      secure: process.env.BASE_URL?.startsWith('https://') ? true : false, // https in production
+      secure: process.env.BASE_URL?.startsWith('https://') ? true : false, 
       sameSite: 'lax',
-      maxAge: 1000 * 60 * 60 * 8 // 8 hours
+      maxAge: 1000 * 60 * 60 * 8 
     }
   })
 );
