@@ -6,7 +6,8 @@
     "description": "Mountain Bikes API with Google OAuth login. Public GETs; write operations require login."
   },
   "servers": [
-    { "url": "http://localhost:3000" }
+    { "url": "http://localhost:3000" },
+    { "url": "https://cse341-week03-il6o.onrender.com" }
   ],
   "components": {
     "securitySchemes": {

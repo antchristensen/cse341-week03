@@ -40,6 +40,8 @@ app.use(
     credentials: true      // allow cookies
   })
 );
+// **NEW** – handle CORS preflight so Swagger POST/PUT/DELETE don’t show “Failed to fetch”
+app.options('*', cors());
 
 // Body parsers & logging
 app.use(express.json());
